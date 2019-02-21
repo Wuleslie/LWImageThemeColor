@@ -1,0 +1,6 @@
+
+target 'LWImageThemeColor' do
+  
+  pod 'SnapKit'
+  
+end
