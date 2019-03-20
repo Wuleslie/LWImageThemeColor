@@ -23,6 +23,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         
         let imageColor = cover?.themeColor()
         paletteView.backgroundColor = imageColor
+        colorValueLabel.text = descriptionOfColor(color: imageColor)
     }
     
     private func setupSubViews() {
@@ -30,6 +31,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         paletteView.addSubview(imageView)
         view.addSubview(libraryButton)
         view.addSubview(cameraButton)
+        view.addSubview(colorValueLabel)
     }
     
     private func setupSubViewsLayout() {
@@ -58,6 +60,12 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             $0.width.equalTo(200)
             $0.height.equalTo(44)
         }
+        
+        colorValueLabel.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.top.equalTo(cameraButton.snp.bottom).offset(16)
+            $0.height.equalTo(30)
+        }
     }
     
     @objc func pickAlbumPhoto() {
@@ -76,7 +84,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         picker .dismiss(animated: true, completion: nil)
         let image = info[UIImagePickerControllerOriginalImage] as? UIImage
         imageView.image = image
-        paletteView.backgroundColor = image?.themeColor()
+        let themeColor = image?.themeColor()
+        paletteView.backgroundColor = themeColor
+        colorValueLabel.text = descriptionOfColor(color: themeColor)
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
@@ -87,6 +97,19 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         return true
     }
     
+    func descriptionOfColor(color:UIColor?) -> String {
+        var red:CGFloat = 0.0
+        var green:CGFloat = 0.0
+        var blue:CGFloat = 0.0
+        var alpha:CGFloat = 0.0
+        color?.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        red = red * 255.0
+        green = green * 255.0
+        blue = blue * 255.0
+        let colorString = String.localizedStringWithFormat("R:%d, G:%d, B:%d, Alpha:%.2lf", Int(red), Int(green), Int(blue), alpha)
+        return colorString
+    }
+    
     lazy var paletteView:UIView = {
         let view = UIView.init()
         return view
@@ -94,7 +117,18 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     lazy var imageView:UIImageView = {
         let view = UIImageView.init()
+        view.contentMode = .scaleAspectFill
+        view.clipsToBounds = true
         return view
+    }()
+    
+    lazy var colorValueLabel:UILabel = {
+        let label = UILabel.init()
+        label.backgroundColor = UIColor.white
+        label.textColor = UIColor.init(red: 128.0/255, green: 82.0/255, blue: 216.0/255, alpha: 1.0)
+        label.font = UIFont.systemFont(ofSize: 15)
+        label.textAlignment = .center
+        return label
     }()
     
     lazy var libraryButton:UIButton = {
